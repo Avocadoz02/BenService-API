@@ -17,7 +17,18 @@ model User {
   id       Int      @id @default(autoincrement())
   username String   @unique
   password String
-  level    String   @default("user")
+  level    String   @default("user") // user, admin
   created  DateTime @default(now())
-  status   String   @default("active")
+  status   String   @default("active") // active, inactive
+}
+
+model Device {
+  id         Int      @id @default(autoincrement())
+  name       String
+  barcode    String
+  serial     String
+  expireDate DateTime
+  remark     String?
+  status     String   @default("active") //  active, inactive
+  createdAt  DateTime @default(now())
 }
