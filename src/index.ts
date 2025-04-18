@@ -26,6 +26,8 @@ const app = new Elysia()
 //
 .get("/api/repairRecord/list", RepairRecordController.list)
 .post("/api/repairRecord/create", RepairRecordController.create)
+.put("/api/repairRecord/update/:id", RepairRecordController.update)
+.delete("/api/repairRecord/remove/:id", RepairRecordController.remove)
 
 // 
 // Department and Section
