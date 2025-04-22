@@ -111,7 +111,8 @@ export const RepairRecordController = {
             return error;
         }
     },
-    updateStatus : async ({ body, params }: {
+
+    updateStatus: async ({ body, params }: {
         body: {
             status: string;
             solving: string;
@@ -125,6 +126,28 @@ export const RepairRecordController = {
             await prisma.repairRecord.update({
                 where: { id: parseInt(params.id) },
                 data: body
+            })
+
+            return { message: "success"};
+        } catch (error) {
+            return error;
+        }
+    },
+
+    receive: async ({ body }: {
+        body: {
+            amount: number;
+            id: number;
+        }
+    }) => {
+        try {
+            await prisma.repairRecord.update({
+                where: { id: body.id },
+                data: { 
+                    amount: body.amount,
+                    payDate: new Date(),
+                    status: "complete"
+                }
             })
 
             return { message: "success"};
