@@ -6,6 +6,7 @@ import { DeviceController } from "./controllers/DeviceController";
 import { DepartmentController } from "./controllers/DepartmentController";
 import { SectionController } from "./controllers/SectionController";
 import { RepairRecordController } from "./controllers/RepairRecordController";
+import { CompanyController } from "./controllers/CompanyController";
 
 const app = new Elysia()
 .use(cors())
@@ -23,6 +24,12 @@ const app = new Elysia()
 .get("api/user/listEngineer", UserController.listEngineer)
 
 //
+// Company
+//
+.get("/api/company/info", CompanyController.info)
+.put("/api/company/update", CompanyController.update)
+
+//
 // Repair Record
 //
 .get("/api/repairRecord/list", RepairRecordController.list)
@@ -31,6 +38,8 @@ const app = new Elysia()
 .delete("/api/repairRecord/remove/:id", RepairRecordController.remove)
 .put("/api/repairRecord/updateStatus/:id", RepairRecordController.updateStatus)
 .put("api/repairRecord/receive", RepairRecordController.receive)
+.get('/api/income/report/list', RepairRecordController.listReport) // API แสดงรายรับตามช่วงวันที่
+.get('/api/income/report/:startDate/:endDate', RepairRecordController.selectedReport) // API แสดงรายรับตามช่วงวันที่
 
 // 
 // Department and Section

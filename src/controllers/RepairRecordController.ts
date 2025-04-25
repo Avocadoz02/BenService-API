@@ -117,6 +117,7 @@ export const RepairRecordController = {
             status: string;
             solving: string;
             engineerId: number;
+            endJobDate?: Date;
         },
         params: {
             id: string;
@@ -151,6 +152,57 @@ export const RepairRecordController = {
             })
 
             return { message: "success"};
+        } catch (error) {
+            return error;
+        }
+    },
+    
+    // List All Income Report
+    listReport: async () => {
+        try {
+            const repairRecords = await prisma.repairRecord.findMany({
+                where: {
+                    status: "complete"
+                },
+                orderBy: {
+                    payDate: "asc"
+                }
+            });
+
+            return repairRecords;
+        } catch (error) {
+            return error;
+        }
+    },
+    
+    // Selected Income Report in period
+    selectedReport: async ({ params }: {
+        params: {
+            startDate: string;
+            endDate: string;
+        }
+    }) => {
+        try {
+            const startDate = new Date(params.startDate);
+            const endDate = new Date(params.endDate);
+
+            startDate.setHours(0, 0, 0, 0);    // เวลา 00:00:00:000
+            endDate.setHours(23, 59, 59, 999); // เวลา 23:59:59:999
+
+            const repairRecords = await prisma.repairRecord.findMany({
+                where: {
+                    payDate: {
+                        gte: startDate,
+                        lte: endDate
+                    },
+                    status: "complete"
+                },
+                orderBy: {
+                    payDate: "asc"
+                }
+            });
+
+            return repairRecords;
         } catch (error) {
             return error;
         }
