@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const dayjs = require('dayjs');
 
 export const RepairRecordController = {
     list: async () => {
@@ -203,6 +204,160 @@ export const RepairRecordController = {
             });
 
             return repairRecords;
+        } catch (error) {
+            return error;
+        }
+    },
+
+    // Information on Dashboard Page
+    // dashboard: async () => {
+    //     try {
+    //         const totalRepairRecord = await prisma.repairRecord.count();
+            
+    //         const totalRepairRecordRepairing = await prisma.repairRecord.count({
+    //             where: {
+    //                 status: { 
+    //                     not: "complete" 
+    //                 }
+    //             }
+    //         });
+            
+    //         const totalRepairRecordComplete = await prisma.repairRecord.count({
+    //             where: {
+    //                 status: "complete"
+    //             }
+    //         });
+            
+    //         const totalAmount = await prisma.repairRecord.aggregate({
+    //             _sum: {
+    //                 amount: true
+    //             },
+    //             where: {
+    //                 status: "complete"
+    //             }
+    //         });
+
+    //         return {
+    //             totalRepairRecord: totalRepairRecord,
+    //             totalRepairRecordComplete: totalRepairRecordComplete,
+    //             totalRepairRecordRepairing: totalRepairRecordRepairing,
+    //             totalAmount: totalAmount._sum.amount
+    //         }
+    //     } catch (error) {
+    //         return error;
+    //     }
+    // }
+    dashboard: async ({ query }: any ) => {
+        try {
+            const totalRepairRecord = await prisma.repairRecord.count();
+            
+            const totalRepairRecordComplete = await prisma.repairRecord.count({
+                where: {
+                    status: "complete"
+                }
+            });
+            
+            const totalRepairRecordRepairing = await prisma.repairRecord.count({
+                where: {
+                    status: {
+                        not: "complete"
+                    }
+                }
+            });
+            
+            const totalAmount = await prisma.repairRecord.aggregate({
+                _sum: {
+                    amount: true
+                },
+                where: {
+                    status: "complete"
+                }
+            });
+
+            // get year and month from query string
+            const year = query.year;
+            const month = query.month;
+            
+            // list for income per day
+            const listIncomePerDay = [];
+            const totalDaysInMonthAndYear = dayjs(`${year}-${month}-01`).daysInMonth();
+
+            for (let i = 1; i <= totalDaysInMonthAndYear; i++) {
+                const startDate = dayjs(`${year}-${month}-${i}`).startOf("day");
+
+                const endDate = dayjs(`${year}-${month}-${i}`).endOf("day");
+
+                const totalIncome = await prisma.repairRecord.aggregate({
+                    _sum: {
+                        amount: true
+                    },
+                    where: {
+                        payDate: {
+                            gte: startDate,
+                            lte: endDate
+                        },
+                        status: "complete"
+                    }
+                });
+
+                // console.log(startDate.$d, endDate.$d)
+                listIncomePerDay.push({
+                    date: i,
+                    amount: totalIncome._sum.amount ?? 0  // change null to 0
+                });
+            }
+           
+            return {
+                totalRepairRecord: totalRepairRecord,
+                totalRepairRecordComplete: totalRepairRecordComplete,
+                totalRepairRecordRepairing: totalRepairRecordRepairing,
+                totalAmount: totalAmount._sum.amount,
+                listIncomePerDay: listIncomePerDay
+            };
+        } catch (error) {
+            return error;
+        }
+    },
+
+    // Income Per Month
+    incomePerMonth: async ({ query }: {
+        query: {
+            year: string;
+        }
+    }) => {
+        try {
+            const year = parseInt(query.year);
+            let listIncomePerMonth = [];
+
+            for (let i = 1; i <= 12; i++) {
+                const totalDaysInMonth = dayjs(`${year}-${i}-01`).daysInMonth();
+
+                console.log(totalDaysInMonth);
+
+                const startDate = dayjs(`${year}-${i}-01`).startOf("month");
+
+                const endDate = dayjs(`${year}-${i}-${totalDaysInMonth}`).endOf("month");
+
+                const totalIncome = await prisma.repairRecord.aggregate({
+                    _sum: {
+                        amount: true
+                    },
+                    where: {
+                        payDate: {
+                            gte: startDate,
+                            lte: endDate
+                        },
+                        status: "complete"
+                    }
+                });
+
+                listIncomePerMonth.push({
+                    month: i,
+                    amount: totalIncome._sum.amount ?? 0  // change null to 0
+                });
+            }
+
+            return listIncomePerMonth;
         } catch (error) {
             return error;
         }
