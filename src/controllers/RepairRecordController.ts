@@ -210,43 +210,6 @@ export const RepairRecordController = {
     },
 
     // Information on Dashboard Page
-    // dashboard: async () => {
-    //     try {
-    //         const totalRepairRecord = await prisma.repairRecord.count();
-            
-    //         const totalRepairRecordRepairing = await prisma.repairRecord.count({
-    //             where: {
-    //                 status: { 
-    //                     not: "complete" 
-    //                 }
-    //             }
-    //         });
-            
-    //         const totalRepairRecordComplete = await prisma.repairRecord.count({
-    //             where: {
-    //                 status: "complete"
-    //             }
-    //         });
-            
-    //         const totalAmount = await prisma.repairRecord.aggregate({
-    //             _sum: {
-    //                 amount: true
-    //             },
-    //             where: {
-    //                 status: "complete"
-    //             }
-    //         });
-
-    //         return {
-    //             totalRepairRecord: totalRepairRecord,
-    //             totalRepairRecordComplete: totalRepairRecordComplete,
-    //             totalRepairRecordRepairing: totalRepairRecordRepairing,
-    //             totalAmount: totalAmount._sum.amount
-    //         }
-    //     } catch (error) {
-    //         return error;
-    //     }
-    // }
     dashboard: async ({ query }: any ) => {
         try {
             const totalRepairRecord = await prisma.repairRecord.count();
@@ -300,7 +263,6 @@ export const RepairRecordController = {
                     }
                 });
 
-                // console.log(startDate.$d, endDate.$d)
                 listIncomePerDay.push({
                     date: i,
                     amount: totalIncome._sum.amount ?? 0  // change null to 0
@@ -331,9 +293,6 @@ export const RepairRecordController = {
 
             for (let i = 1; i <= 12; i++) {
                 const totalDaysInMonth = dayjs(`${year}-${i}-01`).daysInMonth();
-
-                console.log(totalDaysInMonth);
-
                 const startDate = dayjs(`${year}-${i}-01`).startOf("month");
 
                 const endDate = dayjs(`${year}-${i}-${totalDaysInMonth}`).endOf("month");

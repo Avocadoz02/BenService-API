@@ -39,6 +39,7 @@ const app = new Elysia()
 .put("/api/user/updateUser/:id", UserController.updateUser)
 .delete("/api/user/remove/:id", UserController.remove)
 .get("api/user/listEngineer", UserController.listEngineer)
+.get("/api/user/level", UserController.level)
 
 //
 // Dashboard
@@ -75,6 +76,7 @@ const app = new Elysia()
 // 
 .post("/api/device/create", DeviceController.create)
 .get("/api/device/list", DeviceController.list)
+.get("/api/device/listDevicesPage", DeviceController.listDevicesPage)
 .put("/api/device/update/:id", DeviceController.update)
 .delete("/api/device/remove/:id", DeviceController.remove)
 
